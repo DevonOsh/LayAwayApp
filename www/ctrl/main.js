@@ -1,4 +1,4 @@
-app.controller("myCtrl", function($scope) {
+app.controller("myCtrl", function($scope, $http) {
 	$scope.user = {
 		"firstName": "Devon",
 		"lastName": "O'Shaughnessy"
@@ -26,4 +26,24 @@ app.controller("myCtrl", function($scope) {
 			"itemCost": 150.00
 		}
 	]
+
+/*   FIXME Delete if following code works
+	$http.get('api/getUser')
+	.success(function(data) {
+		console.log(data);
+	})
+	.error(function(data) {
+		console.log("Error: " + data);
+	});
+*/
+
+	$http.get('api/getUser').then(success, error);
+
+	function success(response) {
+		console.log(response);
+	}
+
+	function error(err) {
+		console.log("Error: " + err);
+	}
 });

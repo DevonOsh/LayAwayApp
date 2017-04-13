@@ -1,0 +1,66 @@
+ <!DOCTYPE html>
+<html>
+
+<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+<link rel="stylesheet" href="bower_components/font-awesome/font-awesome.css" />
+
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+
+<body>
+
+<div ng-app="myApp">
+
+	<header>
+		<base href="/">
+		<nav class="navbar navbar-default">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/">SuperShop Layaway</a>
+				</div>
+
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href="#/"><i class="fa fa-home"></i> Home</a></li>
+					<li><a href="#/empHome"><i class="fa fa-shield"></i> Employee</a></li>
+				</ul>
+			</div>
+		</nav>
+	</header>
+
+	<ng-view></ng-view>
+
+</div>
+
+<script>
+var app = angular.module("myApp", ["ngRoute"]);
+
+/*app.config(function($compileProvider) {
+	$compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
+});
+*/
+app.config(['$locationProvider', function($locationProvider) {
+  $locationProvider.hashPrefix('');
+}]);
+
+app.config(function($routeProvider){
+	$routeProvider
+	.when("/", {
+		templateUrl: "view/main.html",
+		controller: "myCtrl"
+	})
+	.when("/empHome", {
+		templateUrl: "view/empHome.html",
+		controller: "empCtrl"
+	})
+	.otherwise({
+		template: "<h1>No template found</h1>"
+	});
+});
+
+</script>
+
+<script src="ctrl/main.js"></script>
+<script src="ctrl/empController.js"></script>
+
+</body>
+</html> 
