@@ -1,8 +1,4 @@
 app.controller("myCtrl", function($scope, $http) {
-	$scope.user = {
-		"firstName": "Devon",
-		"lastName": "O'Shaughnessy"
-	}
 	$scope.items = [
 		{
 			"layawayNum": "111111",
@@ -41,6 +37,7 @@ app.controller("myCtrl", function($scope, $http) {
 
 	function success(response) {
 		console.log(response);
+		$scope.user = response.data[0];
 	}
 
 	function error(err) {

@@ -81,9 +81,54 @@ layawayApp.get('/api/getUser', (req, res, next) => {
   });
 });
 
+//FIXME finish and test
+//Select a specific layaway item based on the customer number
+layawayApp.get('/api/getLayawayItems', (req, res, next) => {
+	const results = [];
+	const lwayItemQString = 
+		'SELECT item_num, item_cost FROM layaway_item WHERE layaway_num in (SELECT layaway_num FROM layaway WHERE cust_num = ($1))';
+
+	pg.connect(conString, (err, client, done) => {
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		const query = client.query(lwayItemQString, []);
+	});
+});
 
 layawayApp.get('*', function(request, response) {
 	response.sendFile('./www/index.html');
+});
+
+//FIXME TEST
+//Create a new layaway item
+layawayApp.post('/api/addItem', (req, res, next) => {
+	const results = [];
+	//Data from http request
+	const data = req.body;
+
+	pg.connect(conString, (err, client, done) => {
+		if (err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+
+		//FIXME check on fields for insert statement
+		client.query('INSERT INTO layaway_item(layaway_num, item_num, quantity, item_cost, description, img_url) values($1, $2, $3, $4, $5, $6',
+			[data.layawayNum, data.itemNum, data.quantity, data.itemCost, data.description, data.imgUrl]);
+
+		query.on('row', (row) => {
+			results.push(row);
+		});
+
+		query.on('end', () => {
+			done();
+			return res.json(results);
+		});
+	});
 });
 
 

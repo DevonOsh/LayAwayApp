@@ -1,15 +1,15 @@
-<div>
+<div id="addItemForm" class="container">
+	<h3>Add New Item</h3>
+	<form>
+		<div class="form-group">
+			<input type="text" class="form-control input-lg text-center" placeholder="Layaway Number" ng-model="formData.layawayNum" />
+			<input type="text" class="form-control input-lg text-center" placeholder="Item Number" ng-model="formData.itemNum" />
+			<input type="text" class="form-control input-lg text-center" placeholder="Quantity" ng-model="formData.quantity" />
+			<input type="text" class="form-control input-lg text-center" placeholder="Item Cost" ng-model="formData.itemCost" />
+			<input type="text" class="form-control input-lg text-center" placeholder="Description" ng-model="formData.description" />
+			<input type="text" class="form-control input-lg text-center" placeholder="Image Url" ng-model="formData.imageUrl" />
+		</div>
 
-	<h3>Employee Home</h3>
-
-	<h3>Employee Add Customer</h3>
-
-	<h3>Employee Add Item</h3>
-
-	<h3>Employee Customer</h3>
-
-	<h3>Employee Add Payment</h3>
-
-	{{ message }}
-
+		<button type="submit" class="btn btn-primary btn-lg" ng-click="addItem()">Add Item</button>
+	</form>
 </div>
