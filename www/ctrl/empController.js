@@ -5,7 +5,7 @@ app.controller("empCtrl", function($scope){
 
 	$scope.addItem = function() {
 		$http.post('/api/addItem', $scope.formData).then(success, error);
-	}
+	};
 
 	function success(response) {
 		alert("Success!");
@@ -15,4 +15,11 @@ app.controller("empCtrl", function($scope){
 	function error(err) {
 		console.log("Error: " + err);
 	}
+});
+
+app.controller("empLoginCtrl", function($scope, $location) {
+	$scope.login = function() {
+		alert('Navigating from view..');
+		$location.path('/empHome');
+	};
 });

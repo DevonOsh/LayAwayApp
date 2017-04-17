@@ -21,7 +21,7 @@
 
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="#/"><i class="fa fa-home"></i> Home</a></li>
-					<li><a href="#/empHome"><i class="fa fa-shield"></i> Employee</a></li>
+					<li><a href="#/empLogin"><i class="fa fa-shield"></i> Employees </a></li>
 				</ul>
 			</div>
 		</nav>
@@ -49,12 +49,40 @@ app.config(function($routeProvider){
 		controller: "myCtrl"
 	})
 	.when("/empHome", {
-		templateUrl: "view/empHome.html",
+		templateUrl: "view/employee/empHome.html",
 		controller: "empCtrl"
+	})
+	.when("/empLogin", {
+		templateUrl: "view/employee/empLogin.html",
+		controller: "empLoginCtrl"
+	})
+	.when("/newCust", {
+		templateUrl: "view/employee/newCust.html"
+	})
+	.when("/custLway", {
+		templateUrl: "view/employee/custLway.html"
+	})
+	.when("/newLway", {
+		templateUrl: "view/employee/newLway.html"
+	})
+	.when("/updateLway", {
+		templateUrl: "view/employee/updateLway.html"
+	})
+	.when("/custLogin", {
+		templateUrl: "view/customer/custLogin.html"
+	})
+	.when("/custHome", {
+		templateUrl: "view/customer/customerHome.html"
 	})
 	.otherwise({
 		template: "<h1>No template found</h1>"
 	});
+});
+
+app.controller('appCtrl', function($scope) {
+	$scope.$back = function() {
+		window.history.back();
+	}
 });
 
 </script>
