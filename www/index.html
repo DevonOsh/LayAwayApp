@@ -34,10 +34,6 @@
 <script>
 var app = angular.module("myApp", ["ngRoute"]);
 
-/*app.config(function($compileProvider) {
-	$compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
-});
-*/
 app.config(['$locationProvider', function($locationProvider) {
   $locationProvider.hashPrefix('');
 }]);
@@ -59,7 +55,7 @@ app.config(function($routeProvider){
 	.when("/newCust", {
 		templateUrl: "view/employee/newCust.html"
 	})
-	.when("/custLway", {
+	.when("/custLway/:cust_num", {
 		templateUrl: "view/employee/custLway.html"
 	})
 	.when("/newLway", {
@@ -67,6 +63,9 @@ app.config(function($routeProvider){
 	})
 	.when("/updateLway", {
 		templateUrl: "view/employee/updateLway.html"
+	})
+	.when("/newItem", {
+		templateUrl: "view/employee/newItem.html"
 	})
 	.when("/custLogin", {
 		templateUrl: "view/customer/custLogin.html"
@@ -87,6 +86,7 @@ app.controller('appCtrl', function($scope) {
 
 </script>
 
+<script src="service/dataService.js"></script>
 <script src="ctrl/main.js"></script>
 <script src="ctrl/empController.js"></script>
 
