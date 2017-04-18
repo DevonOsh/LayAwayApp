@@ -1,17 +1,31 @@
 app.controller("empCtrl", function($scope, $http){
 	$scope.message = "Connected to empCtrl";
 
-	$http.get('api/getUser').then(success, error);
+	$http.get('api/getUser').then(userSuccess, userError);
 	
-	function success(response) {
+	function userSuccess(response) {
 		console.log("Successful getting customers.");	//FIXME remove
 		console.log(response.data);
 		$scope.customers = response.data;
 	}
 
-	function error(err) {
-		console.log(err);
+	function userError(error) {
+		console.log(error);
 	}
+
+	//Create new user
+	$scope.addCustomer = function() {
+		console.log($scope.custData);
+		$http.post('api/addCust', { data: $scope.custData }).then(addCustSuccess, addCustError);
+
+		function addCustSuccess(response) {
+			$scope.customers = response.data;
+		}
+
+		function addCustError(error) {
+			console.log(error);
+		}
+	};
 });
 
 app.controller("empLoginCtrl", function($scope, $location) {
@@ -35,6 +49,7 @@ app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 	function error(err) {
 		alert(err);		//FIXME remove
 	}
+
 });
 
 app.controller("newItemCtrl", function($scope, $http) {

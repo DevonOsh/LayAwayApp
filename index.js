@@ -116,6 +116,35 @@ layawayApp.get('*', function(request, response) {
 	response.sendFile('./www/index.html');
 });
 
+//Create a new customer
+layawayApp.post('/api/addCust', (req, res, next) => {
+	const results = [];
+	//Grab customer data from http
+	const custData = req.body;
+	console.log(custData);
+
+	pg.connect(conString, (err, client, done) => {
+		if (err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		//Use to insert data
+		//client.query('INSERT INTO customer(cust_num, f_name, l_name, e_mail, username, password) values ($1, $2, $3, $4, $5, $6);', 
+		//	[custData.cust_num, custData.f_name, custData.l_name, custData.e_mail, custData.username, custData.password]);
+		//Use to read data
+		const query = client.query('SELECT * FROM customer');
+
+		query.on('row', (row) => {
+			results.push(row);
+		});
+		query.on('end', () => {
+			done();
+			return res.json(results);
+		});
+	});
+});
+
 //FIXME TEST
 //Create a new layaway item
 layawayApp.post('/api/addItem', (req, res, next) => {
@@ -131,7 +160,7 @@ layawayApp.post('/api/addItem', (req, res, next) => {
 		}
 
 		//FIXME check on fields for insert statement
-		client.query('INSERT INTO layaway_item(layaway_num, item_num, quantity, item_cost, description, img_url) values($1, $2, $3, $4, $5, $6',
+		client.query('INSERT INTO layaway_item(layaway_num, item_num, quantity, item_cost, description, img_url) values($1, $2, $3, $4, $5, $6);',
 			[data.layawayNum, data.itemNum, data.quantity, data.itemCost, data.description, data.imgUrl]);
 
 		query.on('row', (row) => {

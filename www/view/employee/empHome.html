@@ -18,15 +18,15 @@
 		<h4>New Customer</h4>
 		<form>
 			<div class="form-group">
-				<input type="text" class="form-control input-lg text-center" placeholder="Customer Number" ng-model="formData.cust_num" />
-				<input type="text" class="form-control input-lg text-center" placeholder="First Name" ng-model="formData.f_name" />
-				<input type="text" class="form-control input-lg text-center" placeholder="Last Name" ng-model="formData.l_name" />
-				<input type="text" class="form-control input-lg text-center" placeholder="E-Mail Address" ng-model="formData.e_mail" />
-				<input type="text" class="form-control input-lg text-center" placeholder="Username" ng-model="formData.username" />
-				<input type="text" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.password" />
+				<input type="text" class="form-control input-lg text-center" placeholder="Customer Number" ng-model="custData.cust_num" />
+				<input type="text" class="form-control input-lg text-center" placeholder="First Name" ng-model="custData.f_name" />
+				<input type="text" class="form-control input-lg text-center" placeholder="Last Name" ng-model="custData.l_name" />
+				<input type="text" class="form-control input-lg text-center" placeholder="E-Mail Address" ng-model="custData.e_mail" />
+				<input type="text" class="form-control input-lg text-center" placeholder="Username" ng-model="custData.username" />
+				<input type="text" class="form-control input-lg text-center" placeholder="Password" ng-model="custData.password" />
 			</div>
 
-			<button type="submit" class="btn btn-primary btn-lg" ng-click="">Add Item</button>
+			<button type="submit" class="btn btn-primary btn-lg" ng-click="addCustomer()">Add Customer</button>
 		</form>
 	</div>
 </div>
