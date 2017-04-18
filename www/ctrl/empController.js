@@ -1,36 +1,36 @@
-app.controller("empCtrl", function($scope){
+app.controller("empCtrl", function($scope, $http){
 	$scope.message = "Connected to empCtrl";
 
-	$scope.getCutsomers = function() {
-		$http.get('api/getUser').then(success, error);
-	}
-
+	$http.get('api/getUser').then(success, error);
+	
 	function success(response) {
-		alert("Successful getting customers.");	//FIXME remove
+		console.log("Successful getting customers.");	//FIXME remove
+		console.log(response.data);
 		$scope.customers = response.data;
 	}
 
 	function error(err) {
-
+		console.log(err);
 	}
 });
 
 app.controller("empLoginCtrl", function($scope, $location) {
 	$scope.login = function() {
-		alert('Navigating from view..');	//FIXME remove
 		$location.path('/empHome');
 	};
 
 });
 
-app.controller('custLwayCtrl', function($scope, $http, $routeParams) {
-	var custNum = $routeParams.cust_num;
+app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
+	$scope.custNum = $routeParams.cust_num;
 
-	$http.get('api/getLayAway', { params: custNum }).then(success, error);
+	var url = 'api/getLayaway/' + $scope.custNum;
+
+	$http.put(url).then(success, error);
 
 	function success(response) {
-		var layawayNum = response.data[0].layawayNum;
-		alert("Successful response from getLayaway, first entry: " + layawayNum);	//FIXME remove
+		var layawayNum = response.data[0].layaway_num;
+		console.log("Successful response from getLayaway, first entry: " + layawayNum);	//FIXME remove
 	}
 	function error(err) {
 		alert(err);		//FIXME remove

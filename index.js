@@ -81,12 +81,10 @@ layawayApp.get('/api/getUser', (req, res, next) => {
   });
 });
 
-//FIXME finish and test
 //Select a specific layaway item based on the customer number
-layawayApp.get('/api/getLayaway', (req, res, next) => {
+layawayApp.put('/api/getLayaway/:cust_num', (req, res, next) => {
 	const results = [];
-	const cust_num = req.params;
-	const lwayQString = 'SELECT * from layaway WHERE cust_num = ($1);'
+	const cust_num = req.params.cust_num;
 
 	pg.connect(conString, (err, client, done) => {
 		if(err) {
@@ -94,7 +92,7 @@ layawayApp.get('/api/getLayaway', (req, res, next) => {
 			console.log(err);
 			return res.status(500).json({success: false, data: err});
 		}
-		const query = client.query(lwayQString, [cust_num]);
+		const query = client.query('SELECT * from layaway WHERE cust_num = $1;', [cust_num]);
 
 		query.on('row', (row) => {
 			results.push(row);
@@ -106,6 +104,13 @@ layawayApp.get('/api/getLayaway', (req, res, next) => {
 		});
 	});
 });
+
+//Select the layaway items
+layawayApp.put('/api/getItems/', (req, res, next) => {
+	const results = [];
+	const layaway_num = "";
+});
+
 
 layawayApp.get('*', function(request, response) {
 	response.sendFile('./www/index.html');

@@ -1,23 +1,32 @@
-<div id="addItemForm" class="container">
-	<h3>Employee Home</h3>
-	<h4>Customers</h4>
-
-	<ul class="list-group">
-	</ul>
-</div>
-
 <div id="empHome" class="container">
 	<div class="col-xs-12 col-md-6">
 		<h3>Employee Home</h3>
-		<br />
-		<h3>Customers</h3>
 	</div>
 
-	<div class="col-xs-12">
+	<div id="custList" class="col-xs-12">
+		<h4>Customers</h4>
 		<ul class="list-group">
-			<li ng-href="#/custLway/{{cust.cust_num}}" class="list-group-item col-xs-12" ng-repeat="cust in customers">
-				<span class="col-md-3 col-xs-6">{{customer.f_name}} {{customer.l_name}}</span>
-			</li>
+			<a ng-href="#/custLway/{{cust.cust_num}}" ng-repeat="cust in customers">
+				<li class="list-group-item col-xs-12">
+					<span class="col-xs-12">{{ cust.f_name }} {{ cust.l_name }}</span>
+				</li>
+			</a>
 		</ul>
+	</div>
+
+	<div id="addCust" class="col-xs-12">
+		<h4>New Customer</h4>
+		<form>
+			<div class="form-group">
+				<input type="text" class="form-control input-lg text-center" placeholder="Customer Number" ng-model="formData.cust_num" />
+				<input type="text" class="form-control input-lg text-center" placeholder="First Name" ng-model="formData.f_name" />
+				<input type="text" class="form-control input-lg text-center" placeholder="Last Name" ng-model="formData.l_name" />
+				<input type="text" class="form-control input-lg text-center" placeholder="E-Mail Address" ng-model="formData.e_mail" />
+				<input type="text" class="form-control input-lg text-center" placeholder="Username" ng-model="formData.username" />
+				<input type="text" class="form-control input-lg text-center" placeholder="Password" ng-model="formData.password" />
+			</div>
+
+			<button type="submit" class="btn btn-primary btn-lg" ng-click="">Add Item</button>
+		</form>
 	</div>
 </div>
