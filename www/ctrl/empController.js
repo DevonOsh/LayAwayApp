@@ -39,6 +39,8 @@ app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 	$scope.custNum = $routeParams.cust_num;
 
 	var url = 'api/getLayaway/' + $scope.custNum;
+	var addItemUrl = 'api/addItem';
+	var addPaymentUrl = 'api/addPayment';
 
 	$http.put(url).then(success, error);
 
@@ -50,8 +52,22 @@ app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 		alert(err);		//FIXME remove
 	}
 
+	$scope.addItem = function() {
+		var addItemData = { item_data: $scope.itemData, cust_num: $scope.custNum };
+
+		$http.post(addItemUrl, addItemData).then(success, error);
+	}
+
+	$scope.addPayment = function() {
+		var paymentData = { payment: $scope.paymentAmount, cust_num: $scope.custNum };
+
+		$http.post(addPaymentUrl, paymentData).then(success, error);
+	}
 });
 
+//Old New Item controller
+//FIXME Delete
+/*
 app.controller("newItemCtrl", function($scope, $http) {
 	$scope.formData = {};
 
@@ -68,3 +84,4 @@ app.controller("newItemCtrl", function($scope, $http) {
 		console.log("Error: " + err);
 	}
 })
+*/

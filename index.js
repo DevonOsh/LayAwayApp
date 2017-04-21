@@ -15,50 +15,11 @@ layawayApp.use(bodyParser.json());
 layawayApp.use(bodyParser.urlencoded({ extended: true }));
 layawayApp.use(express.static(__dirname + '/www'));
 
-/*
-function getUser() {
-	var results = [];
-	pg.connect(conString, function (error, client, done) {
-		if (error) {
-			return console.error('error fetching client from pool', error);
-		}
-
-		var query = client.query('SELECT * FROM customer;');
-
-		query.on('row', (row) => {
-      		results.push(row);
-    	});
-
-    	query.on('end', () => {
-    	  	done();
-      		return results;
-    	});
-
-    	/*
-		client.query('SELECT * FROM customer;', function(error, result) {
-			done();
-
-			if (error) {
-				return console.error("error during query");
-			}
-
-			return result;
-			process.exit(0);
-		});
-		
-	});
-}
-*/
-
-
 //App API routes
 
-/*
-layawayApp.get('/api/getUser', function(request, response, next) {
-	var userData = getUser();
-	response.json(userData);
+layawayApp.get('*', function(request, response) {
+	response.sendFile('./www/index.html');
 });
-*/
 
 layawayApp.get('/api/getUser', (req, res, next) => {
   const results = [];
@@ -114,15 +75,10 @@ layawayApp.put('/api/getItems/', (req, res, next) => {
 	const layaway_num = "";
 });
 
-
-layawayApp.get('*', function(request, response) {
-	response.sendFile('./www/index.html');
-});
-
 //Create a new customer
 layawayApp.post('/api/addCust', (req, res, next) => {
 	const results = [];
-	//Grab customer data from http
+	//Grab customer data from body of request
 	const custData = req.body.data;
 	console.log(custData);
 
@@ -132,15 +88,18 @@ layawayApp.post('/api/addCust', (req, res, next) => {
 			console.log(err);
 			return res.status(500).json({success: false, data: err});
 		}
-		//Use to insert data
+		//Create an empty layaway for the customer
+		createLayaway(custData.cust_num);
+		//Insert custData into the customer table
 		client.query('INSERT INTO customer(cust_num, f_name, l_name, e_mail, username, password) values ($1, $2, $3, $4, $5, $6);', 
 			[custData.cust_num, custData.f_name, custData.l_name, custData.e_mail, custData.username, custData.password]);
-		//Use to read data
+		//Select all customers from the table and send them back to the client
 		const query = client.query('SELECT * FROM customer');
 
 		query.on('row', (row) => {
 			results.push(row);
 		});
+		//Results array of customers
 		query.on('end', () => {
 			done();
 			return res.json(results);
@@ -148,12 +107,76 @@ layawayApp.post('/api/addCust', (req, res, next) => {
 	});
 });
 
+function createLayaway(custNum) {
+	var today = new Date();
+	var cust_num = custNum;
+	var layaway_num;
+	pg.connect(conString, (err, client, done) => {
+		if (err) {
+			done();
+			console.log(err);
+			return res.status(500).json({ success: false, data: err});
+		}
+
+		client.query('INSERT INTO layaway(create_date, lpay_date, cust_num) values ($1, $2, $3);',
+			[today, today, cust_num]);
+
+		/*
+		const query = client.query('SELECT layaway_num FROM layaway WHERE cust_num = $1 AND complete = false', [cust_num]);
+
+		query.on('row', (row) => {
+			console.log("What does the layaway_num response lookg like?");
+			console.log(row);
+		});
+
+		query.on('end', () => {
+			done();
+		});
+		*/
+
+		layaway_num = getLayaway(cust_num);
+		return layaway_num;
+
+	});
+}
+
+function getLayaway(custNum) {
+	var cust_num = custNum;
+	var layawayNum;
+
+	pg.connect(conString, (err, client, done) => {
+		if (err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+
+		client.query('SELECT layaway_num FROM layaway WHERE cust_num = $1 AND complete = false', [cust_num]);
+
+		query.on('row', (row, result) => {
+			result.addRow(row);
+		});
+
+		query.on('end', function(result) {
+			done();
+			if (result.rows.length < 1) {
+				console.log("Error: Customer has multiple layaways.");
+			}
+			else {
+				layawayNum = result.rows[0].layaway_num;
+				return layawayNum;
+			}
+		})
+	});
+}
+
 //FIXME TEST
 //Create a new layaway item
 layawayApp.post('/api/addItem', (req, res, next) => {
 	const results = [];
 	//Data from http request
-	const data = req.body;
+	const data = req.body.item_data;
+	const cust_num = req.body.cust_num;
 
 	pg.connect(conString, (err, client, done) => {
 		if (err) {
@@ -176,6 +199,23 @@ layawayApp.post('/api/addItem', (req, res, next) => {
 		});
 	});
 });
+
+layawayApp.post('/api/addPayment', (req, res, next) => {
+
+})
+
+function updateLayaway(data) {
+	//Needs layaway num
+	//If update data is item data, needs item cost
+	//		Then needs to find the layaway and return the amount
+	//		Creat new amount from amaount = amount + item cost
+	//		Update layaway amount field to new value
+
+	//If update data is payment data, needs payment amount
+	//		Find layaway and return amount
+	//		Create new amount from amount = amount - payment
+	//		Update layaway amount field with new value
+}
 
 
 //Listen on port
