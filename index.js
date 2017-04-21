@@ -10,6 +10,8 @@ var pg = require('pg');
 var conString = 'postgres://Devon:dvoshpgsql5421@localhost/sslayaway';
 var client = new pg.Client(conString);
 
+//FIXME check to see if bodyParser removes database update issues
+//layawayApp.use(express.bodyParser());
 layawayApp.use(express.static(__dirname + '/www'));
 
 /*
