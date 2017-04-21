@@ -2,7 +2,7 @@ var express = require('express');
 var layawayApp = express();
 //Place psql require here		FIXME
 //var morgan = require('morgan');
-//var bodyParser = require('body-parser');
+var bodyParser = require('body-parser');
 //var methodOverride = require('method-override');
 
 
@@ -11,7 +11,8 @@ var conString = 'postgres://Devon:dvoshpgsql5421@localhost/sslayaway';
 var client = new pg.Client(conString);
 
 //FIXME check to see if bodyParser removes database update issues
-//layawayApp.use(express.bodyParser());
+layawayApp.use(bodyParser.json());
+layawayApp.use(bodyParser.urlencoded({ extended: true }));
 layawayApp.use(express.static(__dirname + '/www'));
 
 /*
