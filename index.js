@@ -123,7 +123,7 @@ layawayApp.get('*', function(request, response) {
 layawayApp.post('/api/addCust', (req, res, next) => {
 	const results = [];
 	//Grab customer data from http
-	const custData = req.body;
+	const custData = req.body.data;
 	console.log(custData);
 
 	pg.connect(conString, (err, client, done) => {
@@ -133,8 +133,8 @@ layawayApp.post('/api/addCust', (req, res, next) => {
 			return res.status(500).json({success: false, data: err});
 		}
 		//Use to insert data
-		//client.query('INSERT INTO customer(cust_num, f_name, l_name, e_mail, username, password) values ($1, $2, $3, $4, $5, $6);', 
-		//	[custData.cust_num, custData.f_name, custData.l_name, custData.e_mail, custData.username, custData.password]);
+		client.query('INSERT INTO customer(cust_num, f_name, l_name, e_mail, username, password) values ($1, $2, $3, $4, $5, $6);', 
+			[custData.cust_num, custData.f_name, custData.l_name, custData.e_mail, custData.username, custData.password]);
 		//Use to read data
 		const query = client.query('SELECT * FROM customer');
 
