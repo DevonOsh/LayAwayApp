@@ -222,7 +222,11 @@ function createLayaway(custNum) {
 	});
 }
 
-function addItemCost(layaway_num, item_cost) {
+function addItemCost(layaway_num, itemCost) {
+	console.log("The item cost type: " + typeof itemCost);		//FIXME REMOVE
+	var item_cost = parseFloat(itemCost);
+	console.log("New item cost type: " + typeof item_cost + ", value: " + item_cost);
+
 	pg.connect(conString, (err, client, done) => {
 		if (err) {
 			done();
@@ -231,8 +235,13 @@ function addItemCost(layaway_num, item_cost) {
 
 		client.query('SELECT layaway_amount FROM layaway WHERE layaway_num = $1 AND complete = false;', [layaway_num])
 		.then( (response) => {
-			var amount = response.rows[0].layaway_amount;
+			var amountResponse = response.rows[0].layaway_amount;
+			var amountString = amountResponse.substr(1);
+			console.log("Amount string? " + amountString);
+			var amount = parseFloat(amountString);
+			console.log("Amount type is " + typeof amount + ", value: " + amount);		//FIXME REMOVE
 			var new_amount = amount + item_cost;
+			console.log("New amount is " + new_amount);
 
 			client.query('UPDATE layaway SET layaway_amount = $1 WHERE layaway_num = $2;', [new_amount, layaway_num]);
 		});
