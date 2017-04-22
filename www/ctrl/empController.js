@@ -42,13 +42,14 @@ app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 	console.log("Type of cust num: ");
 	console.log(typeof $scope.cust_num);
 
-	var url = 'api/getLayawayNum/' + $scope.custNum;
+	var getLwayNumUrl = 'api/getLayawayNum/' + $scope.custNum;
+	var getLwayAmtUrl = 'api/getLayawayAmount/' + scope.custNum;
 	var addItemUrl;
 	var addPaymentUrl;
 	var getItemsUrl;
 	var layaway_num; //Get with it's own api, then use with the above urls to pass and update data
 
-	$http.put(url)
+	$http.put(getLwayNumUrl)
 	.then(success, error)
 	.then( () => {
 		console.log("Type of layaway num: ");
@@ -63,6 +64,8 @@ app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 			console.log(error);
 		});
 	});
+
+	$http.put(getLwayAmtUrl).then( (response) => $scope.lwayAmt = response.data[0].layaway_amount; );
 
 	function success(response) {
 		layaway_num = response.data[0].layaway_num;
@@ -81,6 +84,9 @@ app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 			//FIXME remove
 			console.log(response.data);
 			$scope.items = response.data;
+
+			//Refetch the layaway amount after update
+			$http.put(getLwayAmtUrl).then( (response) => $scope.lwayAmt = response.data[0].layaway_amount; );
 		}
 
 		function error(err) {
@@ -92,6 +98,16 @@ app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 		var paymentData = { payment: $scope.paymentAmount, cust_num: $scope.custNum };
 
 		$http.post(addPaymentUrl, paymentData).then(success, error);
+
+		function success(response) {
+			console.log(response.data);
+
+			$http.put(getLwayAmtUrl).then( (response) => $scope.lwayAmt = response.data[0].layaway_amount; );
+		}
+
+		function error(err) {
+			console.log(err);
+		}
 	}
 });
 
