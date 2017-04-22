@@ -36,7 +36,7 @@ app.controller("myCtrl", function($scope, $http) {
 	$http.get('api/getUser').then(success, error);
 
 	function success(response) {
-		console.log(response);
+		console.log(response.data);
 		$scope.user = response.data[0];
 	}
 

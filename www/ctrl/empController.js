@@ -19,7 +19,9 @@ app.controller("empCtrl", function($scope, $http){
 		$http.post('api/addCust', { data: $scope.custData }).then(addCustSuccess, addCustError);
 
 		function addCustSuccess(response) {
-			$scope.customers = response.data;
+			$scope.customers = response.data.customers;
+			//FIXME remove
+			console.log(response.data.layaway_num);
 		}
 
 		function addCustError(error) {
@@ -37,25 +39,53 @@ app.controller("empLoginCtrl", function($scope, $location) {
 
 app.controller("custLwayCtrl", function($scope, $http, $routeParams) {
 	$scope.custNum = $routeParams.cust_num;
+	console.log("Type of cust num: ");
+	console.log(typeof $scope.cust_num);
 
-	var url = 'api/getLayaway/' + $scope.custNum;
-	var addItemUrl = 'api/addItem';
-	var addPaymentUrl = 'api/addPayment';
+	var url = 'api/getLayawayNum/' + $scope.custNum;
+	var addItemUrl;
+	var addPaymentUrl;
+	var getItemsUrl;
+	var layaway_num; //Get with it's own api, then use with the above urls to pass and update data
 
-	$http.put(url).then(success, error);
+	$http.put(url)
+	.then(success, error)
+	.then( () => {
+		console.log("Type of layaway num: ");
+		console.log(typeof layaway_num);
+		addItemUrl = 'api/addItem/' + layaway_num;
+		addPaymentUrl = 'api/addPayment/' + layaway_num;
+		getItemsUrl = 'api/getItems/' + layaway_num;
+
+		$http.put(getItemsUrl).then( (response) => {
+			$scope.items = response.data;
+		}, (error) => {
+			console.log(error);
+		});
+	});
 
 	function success(response) {
-		var layawayNum = response.data[0].layaway_num;
-		console.log("Successful response from getLayaway, first entry: " + layawayNum);	//FIXME remove
+		layaway_num = response.data[0].layaway_num;
 	}
 	function error(err) {
 		alert(err);		//FIXME remove
 	}
 
 	$scope.addItem = function() {
-		var addItemData = { item_data: $scope.itemData, cust_num: $scope.custNum };
+		alert("Running addItem");
+		var itemData = { item_data: $scope.itemData };
 
-		$http.post(addItemUrl, addItemData).then(success, error);
+		$http.post(addItemUrl, itemData).then(success, error);
+
+		function success(response) {
+			//FIXME remove
+			console.log(response.data);
+			$scope.items = response.data;
+		}
+
+		function error(err) {
+			console.log(err);
+		}
 	}
 
 	$scope.addPayment = function() {
