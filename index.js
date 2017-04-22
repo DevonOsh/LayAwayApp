@@ -1,12 +1,9 @@
 var express = require('express');
 var layawayApp = express();
-//Place psql require here		FIXME
-//var morgan = require('morgan');
 var bodyParser = require('body-parser');
-//var methodOverride = require('method-override');
-
-
 var pg = require('pg');
+
+//PostgreSQL connection data
 var conString = 'postgres://Devon:dvoshpgsql5421@localhost/sslayaway';
 var client = new pg.Client(conString);
 
@@ -21,26 +18,114 @@ layawayApp.get('/', function(request, response) {
 	response.sendFile(__dirname + '/www/index.html');
 });
 
+//APIs for customer section
+
+layawayApp.post('/api/getCustNum', (req, res, next) => {
+	const results = [];
+	const username = req.body.username;
+	const password = req.body.password;
+
+	 pg.connect(conString, (err, client, done) => {
+	    if(err) {
+	      done();
+	      console.log(err);
+	      return res.status(500).json({success: false, data: err});
+	    }
+
+	    const query = client.query('SELECT cust_num FROM customer WHERE username = $1 AND password = $2;', [username, password]);
+
+	    query.on('row', (row) => {
+	      results.push(row);
+	    });
+
+	    query.on('error', () => {
+	    	done();
+	    	return res.status(500).json( { success: false, data: "Invalid username or password "});
+	    })
+
+	    query.on('end', () => {
+	      done();
+	      return res.json(results);
+	    });
+	 });
+
+});
+
+//Get user info after successful login
+layawayApp.put('/api/getUserInfo/:cust_num', (req, res, next) => {
+	const results = [];
+	const cust_num = req.params.cust_num;
+
+	pg.connect(conString, (err, client, done) => {
+	    if(err) {
+	      done();
+	      console.log(err);
+	      return res.status(500).json({success: false, data: err});
+	    }
+
+	    const query = client.query('SELECT * FROM customer WHERE cust_num = $1;', [cust_num]);
+
+	    query.on('row', (row) => {
+	      results.push(row);
+	    });
+
+	    query.on('end', () => {
+	      done();
+	      return res.json(results);
+	    });
+	});
+});
+
+//Get users layaway
+layawayApp.put('/api/getLayaway/:cust_num', (req, res, next) => {
+	const results = [];
+	const cust_num = req.params.cust_num;
+
+	pg.connect(conString, (err, client, done) => {
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		const query = client.query('SELECT * from layaway WHERE cust_num = $1 AND complete = false;', [cust_num]);
+
+		query.on('error', function(error) {
+			console.log("There was an error getting layaway...");
+			console.log(error);
+		});
+
+		query.on('row', (row) => {
+			results.push(row);
+		});
+
+		query.on('end', () => {
+			done();
+			return res.json(results);
+		});
+	});
+});
+
+
+//APIS for employee section
+//Get all customers, I know bad name
 layawayApp.get('/api/getUser', (req, res, next) => {
   const results = [];
-  // Get a Postgres client from the connection pool
+
   pg.connect(conString, (err, client, done) => {
-    // Handle connection errors
     if(err) {
       done();
       console.log(err);
       return res.status(500).json({success: false, data: err});
     }
-    // SQL Query > Select Data
+
     const query = client.query('SELECT * FROM customer;');
-    // Stream results back one row at a time
+
     query.on('row', (row) => {
       results.push(row);
     });
-    // After all data is returned, close connection and return results
+
     query.on('end', () => {
       done();
-      //return res.json(results);
       return res.status(200).json(results);
     });
   });
@@ -69,11 +154,6 @@ layawayApp.post('/api/addCust', (req, res, next) => {
 				createLayaway(custData.cust_num);
 			});
 		//Select all customers from the table and send them back to the client
-
-		//FIXME remove
-		//Create an empty layaway for the customer
-		//layaway_num = createLayaway(custData.cust_num);
-		//console.log("Layaway_num from addCust" + layaway_num);
 
 		const query = client.query('SELECT * FROM customer');
 
@@ -128,6 +208,37 @@ layawayApp.put('/api/getLayawayNum/:cust_num', (req, res, next) => {
 	});
 });
 
+layawayApp.put('/api/getLayawayAmount/:cust_num', (req, res, next) => {
+	const results = [];
+	const cust_num = req.params.cust_num;
+
+	console.log("Running getLayawayAmount...");
+	console.log("Cust num sent from client: " + cust_num);
+
+	pg.connect(conString, (err, client, done) => {
+		if(err) {
+			done();
+			console.log(err);
+			return res.status(500).json({success: false, data: err});
+		}
+		const query = client.query('SELECT layaway_amount from layaway WHERE cust_num = $1 AND complete = false;', [cust_num]);
+
+		query.on('error', function(error) {
+			console.log("There was an error getting layaway_num...");
+			console.log(error);
+		});
+
+		query.on('row', (row) => {
+			results.push(row);
+		});
+
+		query.on('end', () => {
+			done();
+			return res.json(results);
+		});
+	});
+});
+
 //Select the layaway items
 layawayApp.put('/api/getItems/:layaway_num', (req, res, next) => {
 	const results = [];
@@ -153,7 +264,6 @@ layawayApp.put('/api/getItems/:layaway_num', (req, res, next) => {
 	});
 });
 
-//FIXME TEST
 //Create a new layaway item
 layawayApp.post('/api/addItem/:layaway_num', (req, res, next) => {
 	const results = [];
@@ -187,6 +297,54 @@ layawayApp.post('/api/addItem/:layaway_num', (req, res, next) => {
 	});
 });
 
+layawayApp.post('/api/addPayment/:layaway_num', (req, res, next) => {
+	const results = [];
+	const layaway_num = req.params.layaway_num;
+	const payment = req.body.data;
+	const today = new Date();
+
+	pg.connect(conString, (err, client, done) => {
+		if (err) {
+			done();
+			console.log(err);
+		}
+
+		client.query('SELECT layaway_amount FROM layaway WHERE layaway_num = $1 AND complete = false;', [layaway_num])
+		.then( (response) => {
+			var amount_response = response.rows[0].layaway_amount;
+			var amount_string = amount_response.substr(1);
+			var amount = parseFloat(amount_string);
+			var new_amount = amount - payment;
+
+			client.query('UPDATE layaway SET layaway_amount = $1, lpay_date = $2 WHERE layaway_num = $3;', [new_amount, today, layaway_num])
+			.then( () => {
+				checkLayaway(layaway_num);
+			});
+		});
+	});
+});
+
+function checkLayaway(layaway_num) {
+	pg.connect(conString, (err, client, done) => {
+		if (err) {
+			done();
+			console.log(err);
+		}
+
+		client.query('SELECT layaway_amount FROM layaway WHERE layaway_num = $1;', [layaway_num])
+		.then( (response) => {
+			var amount_response = response.rows[0].layaway_amount;
+			var amount_string = amount_response.substr(1);
+			var amount = parseFloat(amount_string);
+
+			if (amount <= 0) {
+				//Layaway has been paid, set complete to false
+				client.query('UPDATE layaway SET complete = true WHERE layaway_num = $1;', [layaway_num]);
+			}
+		});
+	});
+}
+
 function createLayaway(custNum) {
 	var today = new Date();
 	var cust_num = custNum;
@@ -205,27 +363,11 @@ function createLayaway(custNum) {
 				console.log("layaway_num at end of query in createLayaway: " + layaway_num);
 				return layaway_num;
 			});
-
-		/*
-		const query = client.query('SELECT layaway_num FROM layaway WHERE cust_num = $1 AND complete = false', [cust_num]);
-
-		query.on('row', (row) => {
-			console.log("What does the layaway_num response lookg like?");
-			console.log(row);
-		});
-
-		query.on('end', () => {
-			done();
-		});
-		*/
-
 	});
 }
 
 function addItemCost(layaway_num, itemCost) {
-	console.log("The item cost type: " + typeof itemCost);		//FIXME REMOVE
 	var item_cost = parseFloat(itemCost);
-	console.log("New item cost type: " + typeof item_cost + ", value: " + item_cost);
 
 	pg.connect(conString, (err, client, done) => {
 		if (err) {
@@ -237,20 +379,13 @@ function addItemCost(layaway_num, itemCost) {
 		.then( (response) => {
 			var amountResponse = response.rows[0].layaway_amount;
 			var amountString = amountResponse.substr(1);
-			console.log("Amount string? " + amountString);
 			var amount = parseFloat(amountString);
-			console.log("Amount type is " + typeof amount + ", value: " + amount);		//FIXME REMOVE
 			var new_amount = amount + item_cost;
-			console.log("New amount is " + new_amount);
 
 			client.query('UPDATE layaway SET layaway_amount = $1 WHERE layaway_num = $2;', [new_amount, layaway_num]);
 		});
-	})
+	});
 }
-
-layawayApp.post('/api/addPayment/:layaway_num', (req, res, next) => {
-
-});
 
 
 //Listen on port

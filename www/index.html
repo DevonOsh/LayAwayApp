@@ -41,8 +41,12 @@ app.config(['$locationProvider', function($locationProvider) {
 app.config(function($routeProvider){
 	$routeProvider
 	.when("/", {
-		templateUrl: "view/main.html",
-		controller: "myCtrl"
+		templateUrl: "view/custLogin.html",
+		controller: "custLoginCtrl"
+	})
+	.when("/custHome/:cust_num", {
+		templateUrl: "view/customer/customerHome.html",
+		controller: "custCtrl"
 	})
 	.when("/empHome", {
 		templateUrl: "view/employee/empHome.html",
@@ -52,27 +56,9 @@ app.config(function($routeProvider){
 		templateUrl: "view/employee/empLogin.html",
 		controller: "empLoginCtrl"
 	})
-	.when("/newCust", {
-		templateUrl: "view/employee/newCust.html"
-	})
 	.when("/custLway/:cust_num", {
 		templateUrl: "view/employee/custLway.html",
 		controller: "custLwayCtrl"
-	})
-	.when("/newLway", {
-		templateUrl: "view/employee/newLway.html"
-	})
-	.when("/updateLway", {
-		templateUrl: "view/employee/updateLway.html"
-	})
-	.when("/newItem", {
-		templateUrl: "view/employee/newItem.html"
-	})
-	.when("/custLogin", {
-		templateUrl: "view/customer/custLogin.html"
-	})
-	.when("/custHome", {
-		templateUrl: "view/customer/customerHome.html"
 	})
 	.otherwise({
 		template: "<h1>No template found</h1>"
@@ -89,6 +75,7 @@ app.controller('appCtrl', function($scope) {
 
 <script src="service/dataService.js"></script>
 <script src="ctrl/main.js"></script>
+<script src="ctrl/customerController.js"></script>
 <script src="ctrl/empController.js"></script>
 
 </body>
